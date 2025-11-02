@@ -25,7 +25,7 @@ export const files = [
     name: 'readme.txt',
     owner: 'admin',
     permissions: 'rwxr--r--',
-    content: 'Welcome to VirtOS! This is a public readme file.'
+    content: 'Welcome to VirtuOS! This is a public readme file.'
   },
   {
     name: 'config.sys',

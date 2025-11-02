@@ -134,6 +134,7 @@ export const TypingAnimation = ({
 
 export const Terminal = ({ children, className, sequence = true, startOnView = true }) => {
   const containerRef = useRef(null)
+  const scrollRef = useRef(null)
   const isInView = useInView(containerRef, {
     amount: 0.3,
     once: true
@@ -141,6 +142,13 @@ export const Terminal = ({ children, className, sequence = true, startOnView = t
 
   const [activeIndex, setActiveIndex] = useState(0)
   const sequenceHasStarted = sequence ? !startOnView || isInView : false
+
+  // Auto-scroll to bottom whenever children change
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [children])
 
   const contextValue = useMemo(() => {
     if (!sequence) return null
@@ -178,7 +186,7 @@ export const Terminal = ({ children, className, sequence = true, startOnView = t
           <div className='h-2 w-2 rounded-full bg-green-500'></div>
         </div>
       </div>
-      <div className='overflow-y-auto flex-1'>
+      <div ref={scrollRef} className='overflow-y-auto flex-1'>
         <pre className='p-4'>
           <code className='grid gap-y-1'>{wrappedChildren}</code>
         </pre>

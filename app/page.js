@@ -9,12 +9,29 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState('guest')
   const [securityLogs, setSecurityLogs] = useState([])
   const [terminalLines, setTerminalLines] = useState([
-    'VirtOS Security Terminal v1.0',
+    'VirtuOS Security Terminal v1.0',
     'Type "help" for available commands',
     ''
   ])
   const [inputValue, setInputValue] = useState('')
   const inputRef = useRef(null)
+  const terminalScrollRef = useRef(null)
+
+  // Auto-scroll to bottom when terminal lines change
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (terminalScrollRef.current) {
+        const scrollContainer = terminalScrollRef.current.querySelector('.overflow-y-auto')
+        if (scrollContainer) {
+          scrollContainer.scrollTop = scrollContainer.scrollHeight
+        }
+      }
+    }
+
+    // Small delay to allow content to render
+    const timeoutId = setTimeout(scrollToBottom, 50)
+    return () => clearTimeout(timeoutId)
+  }, [terminalLines])
 
   const addSecurityLog = (message) => {
     const time = new Date().toLocaleTimeString()
@@ -32,7 +49,7 @@ export default function Home() {
 
     // Handle clear - clear both terminal and security logs
     if (result.action === 'clear') {
-      setTerminalLines(['VirtOS Security Terminal v1.0', 'Type "help" for available commands', ''])
+      setTerminalLines(['VirtuOS Security Terminal v1.0', 'Type "help" for available commands', ''])
       setSecurityLogs([])
       setInputValue('')
       return
@@ -56,7 +73,7 @@ export default function Home() {
   }
 
   const runDemo = () => {
-    setTerminalLines(['VirtOS Security Terminal v1.0', 'Type "help" for available commands', ''])
+    setTerminalLines(['VirtuOS Security Terminal v1.0', 'Type "help" for available commands', ''])
     setSecurityLogs([])
     setCurrentUser('guest')
 
@@ -111,7 +128,7 @@ export default function Home() {
             </div>
             <button
               onClick={runDemo}
-              className='w-full sm:w-auto px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors'
+              className='w-full sm:w-auto px-6 py-2 cursor-pointer bg-black dark:bg-white text-white dark:text-black rounded text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors'
             >
               Run Demo
             </button>
@@ -119,13 +136,15 @@ export default function Home() {
 
           {/* Terminal Section */}
           <div className='space-y-3 sm:space-y-4'>
-            <Terminal className='w-full max-w-full' sequence={false} startOnView={false}>
-              {terminalLines.map((line, index) => (
-                <TypingAnimation key={index} duration={20}>
-                  {line}
-                </TypingAnimation>
-              ))}
-            </Terminal>
+            <div ref={terminalScrollRef}>
+              <Terminal className='w-full max-w-full' sequence={false} startOnView={false}>
+                {terminalLines.map((line, index) => (
+                  <TypingAnimation key={index} duration={20}>
+                    {line}
+                  </TypingAnimation>
+                ))}
+              </Terminal>
+            </div>
 
             {/* Interactive Input - Responsive */}
             <form
