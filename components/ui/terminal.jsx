@@ -1,16 +1,8 @@
-"use client";
-import {
-  Children,
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
-import { motion, useInView } from "motion/react";
+'use client'
+import { Children, createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { motion, useInView } from 'motion/react'
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
 const SequenceContext = createContext(null)
 
@@ -19,17 +11,11 @@ const useSequence = () => useContext(SequenceContext)
 const ItemIndexContext = createContext(null)
 const useItemIndex = () => useContext(ItemIndexContext)
 
-export const AnimatedSpan = ({
-  children,
-  delay = 0,
-  className,
-  startOnView = false,
-  ...props
-}) => {
+export const AnimatedSpan = ({ children, delay = 0, className, startOnView = false, ...props }) => {
   const elementRef = useRef(null)
   const isInView = useInView(elementRef, {
     amount: 0.3,
-    once: true,
+    once: true
   })
 
   const sequence = useSequence()
@@ -52,16 +38,17 @@ export const AnimatedSpan = ({
       initial={{ opacity: 0, y: -5 }}
       animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: -5 }}
       transition={{ duration: 0.3, delay: sequence ? 0 : delay / 1000 }}
-      className={cn("grid text-sm font-normal tracking-tight", className)}
+      className={cn('grid text-sm font-normal tracking-tight', className)}
       onAnimationComplete={() => {
         if (!sequence) return
         if (itemIndex === null) return
         sequence.completeItem(itemIndex)
       }}
-      {...props}>
+      {...props}
+    >
       {children}
     </motion.div>
-  );
+  )
 }
 
 export const TypingAnimation = ({
@@ -69,25 +56,28 @@ export const TypingAnimation = ({
   className,
   duration = 60,
   delay = 0,
-  as: Component = "span",
+  as: Component = 'span',
   startOnView = true,
   ...props
 }) => {
-  if (typeof children !== "string") {
-    throw new Error("TypingAnimation: children must be a string. Received:")
+  if (typeof children !== 'string') {
+    throw new Error('TypingAnimation: children must be a string. Received:')
   }
 
-  const MotionComponent = useMemo(() =>
-    motion.create(Component, {
-      forwardMotionProps: true,
-    }), [Component])
+  const MotionComponent = useMemo(
+    () =>
+      motion.create(Component, {
+        forwardMotionProps: true
+      }),
+    [Component]
+  )
 
-  const [displayedText, setDisplayedText] = useState("")
+  const [displayedText, setDisplayedText] = useState('')
   const [started, setStarted] = useState(false)
   const elementRef = useRef(null)
   const isInView = useInView(elementRef, {
     amount: 0.3,
-    once: true,
+    once: true
   })
 
   const sequence = useSequence()
@@ -105,22 +95,14 @@ export const TypingAnimation = ({
 
     if (!startOnView) {
       const startTimeout = setTimeout(() => setStarted(true), delay)
-      return () => clearTimeout(startTimeout);
+      return () => clearTimeout(startTimeout)
     }
 
     if (!isInView) return
 
     const startTimeout = setTimeout(() => setStarted(true), delay)
-    return () => clearTimeout(startTimeout);
-  }, [
-    delay,
-    startOnView,
-    isInView,
-    started,
-    sequence?.activeIndex,
-    sequence?.sequenceStarted,
-    itemIndex,
-  ])
+    return () => clearTimeout(startTimeout)
+  }, [delay, startOnView, isInView, started, sequence?.activeIndex, sequence?.sequenceStarted, itemIndex])
 
   useEffect(() => {
     if (!started) return
@@ -140,29 +122,21 @@ export const TypingAnimation = ({
 
     return () => {
       clearInterval(typingEffect)
-    };
+    }
   }, [children, duration, started])
 
   return (
-    <MotionComponent
-      ref={elementRef}
-      className={cn("text-sm font-normal tracking-tight", className)}
-      {...props}>
+    <MotionComponent ref={elementRef} className={cn('text-sm font-normal tracking-tight', className)} {...props}>
       {displayedText}
     </MotionComponent>
-  );
+  )
 }
 
-export const Terminal = ({
-  children,
-  className,
-  sequence = true,
-  startOnView = true
-}) => {
+export const Terminal = ({ children, className, sequence = true, startOnView = true }) => {
   const containerRef = useRef(null)
   const isInView = useInView(containerRef, {
     amount: 0.3,
-    once: true,
+    once: true
   })
 
   const [activeIndex, setActiveIndex] = useState(0)
@@ -175,8 +149,8 @@ export const Terminal = ({
         setActiveIndex((current) => (index === current ? current + 1 : current))
       },
       activeIndex,
-      sequenceStarted: sequenceHasStarted,
-    };
+      sequenceStarted: sequenceHasStarted
+    }
   }, [sequence, activeIndex, sequenceHasStarted])
 
   const wrappedChildren = useMemo(() => {
@@ -186,34 +160,33 @@ export const Terminal = ({
       <ItemIndexContext.Provider key={index} value={index}>
         {child}
       </ItemIndexContext.Provider>
-    ));
+    ))
   }, [children, sequence])
 
   const content = (
     <div
       ref={containerRef}
       className={cn(
-        "border-border bg-background z-0 h-full max-h-[400px] w-full max-w-lg rounded-xl border",
+        'border-border bg-background z-0 w-full max-w-lg rounded-xl border flex flex-col h-[400px]',
         className
-      )}>
-      <div className="border-border flex flex-col gap-y-2 border-b p-4">
-        <div className="flex flex-row gap-x-2">
-          <div className="h-2 w-2 rounded-full bg-red-500"></div>
-          <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
-          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+      )}
+    >
+      <div className='border-border flex flex-col gap-y-2 border-b p-4 flex-shrink-0'>
+        <div className='flex flex-row gap-x-2'>
+          <div className='h-2 w-2 rounded-full bg-red-500'></div>
+          <div className='h-2 w-2 rounded-full bg-yellow-500'></div>
+          <div className='h-2 w-2 rounded-full bg-green-500'></div>
         </div>
       </div>
-      <pre className="p-4">
-        <code className="grid gap-y-1 overflow-auto">{wrappedChildren}</code>
-      </pre>
+      <div className='overflow-y-auto flex-1'>
+        <pre className='p-4'>
+          <code className='grid gap-y-1'>{wrappedChildren}</code>
+        </pre>
+      </div>
     </div>
   )
 
   if (!sequence) return content
 
-  return (
-    <SequenceContext.Provider value={contextValue}>
-      {content}
-    </SequenceContext.Provider>
-  );
+  return <SequenceContext.Provider value={contextValue}>{content}</SequenceContext.Provider>
 }
